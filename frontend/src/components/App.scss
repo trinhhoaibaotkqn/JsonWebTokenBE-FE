@@ -1,0 +1,15 @@
+@import "~bootstrap/scss/bootstrap";
+
+.App {
+    text-align: center;
+
+    .header-container {
+        .navbar-nav {
+            .nav-link {
+                &.active {
+                    color: #5ABE7D;
+                }
+            }
+        }
+    }
+}
