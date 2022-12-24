@@ -8,7 +8,7 @@ const route = require('./routes');
 
 
 const app = express();
-const port = 3000;
+const port = 8080;
 
 mongoose.connect(process.env.MONGODB_URL, () =>
   console.log("Connect to database successfully"));

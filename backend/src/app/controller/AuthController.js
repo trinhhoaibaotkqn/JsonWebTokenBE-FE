@@ -9,6 +9,10 @@ class AuthController {
     //[POST] REGISTER
     async register(req, res) {
         try {
+            const userDB = await User.findOne({ username: req.body.username });
+            if (userDB) {
+                return res.status(404).json("username already exists");
+            }
             //Hash password
             const salt = await bcrypt.genSalt(10);
             const hashed = await bcrypt.hash(req.body.password, salt);
@@ -20,8 +24,8 @@ class AuthController {
             })
             //Save user
             const user = await newUser.save();
-            res.status(200).json(user);
-
+            const { password, ...others } = user._doc;
+            res.status(200).json(others);
         } catch (err) {
             res.status(500).json("error");
         }
@@ -35,7 +39,7 @@ class AuthController {
     async login(req, res) {
         try {
             //Check username
-            const user = await User.findOne({ username: req.body.username })
+            const user = await User.findOne({ username: req.body.username });
             if (!user) {
                 return res.status(404).json("Wrong username");
             }
@@ -61,7 +65,7 @@ class AuthController {
                     }
                 )
                 const { password, ...others } = user._doc;//liên quan đến mongoose
-                return res.status(200).json({ others, accessToken });
+                return res.status(200).json({ ...others, accessToken });
             }
         } catch {
             res.status(500).json("error");
