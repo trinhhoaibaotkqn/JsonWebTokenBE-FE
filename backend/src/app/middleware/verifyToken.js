@@ -51,7 +51,7 @@ verifyRefreshToken = async (req, res, next) => {
         });
     }
     else {
-        res.status(401).json("Token is not valid");
+        res.status(403).json("Token is not valid");
     }
 }
 

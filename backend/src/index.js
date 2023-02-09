@@ -6,20 +6,24 @@ const dotenv = require('dotenv').config();
 
 const route = require('./routes');
 
-
 const app = express();
 const port = 8080;
 
-mongoose.connect(process.env.MONGODB_URL, () =>
-  console.log("Connect to database successfully"));
-
+const db = require('../src/configdb/index');
+db.connect();
 app.use(express.urlencoded({
   extended: true
 }))
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors());
+app.use(cors(
+  {
+    origin: "http://localhost:3000",
+    credentials: true,
+  }
+));
+
 //init route
 route(app);
 

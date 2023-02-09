@@ -10,7 +10,7 @@ let token = {
                 admin: user.admin
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: '30d' },
+            { expiresIn: '5s' },
         );
     },
 

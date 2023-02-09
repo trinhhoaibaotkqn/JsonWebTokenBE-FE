@@ -11,7 +11,12 @@ class AuthController {
         try {
             const userDB = await User.findOne({ username: req.body.username });
             if (userDB) {
-                return res.status(404).json("username already exists");
+                return res.status(400).json({
+                    errCode: 1,
+                    message: "Username already exists",
+                    user: {}
+                }
+                );
             }
             //Hash password
             const salt = await bcrypt.genSalt(10);
@@ -25,7 +30,11 @@ class AuthController {
             //Save user
             const user = await newUser.save();
             const { password, ...others } = user._doc;
-            res.status(200).json(others);
+            res.status(200).json({
+                errCode: 0,
+                message: "User already created successfully",
+                user: others
+            });
         } catch (err) {
             res.status(500).json("error");
         }
@@ -41,12 +50,20 @@ class AuthController {
             //Check username
             const user = await User.findOne({ username: req.body.username });
             if (!user) {
-                return res.status(404).json("Wrong username");
+                return res.status(401).json({
+                    errCode: 1,
+                    message: "Wrong username",
+                    user: {}
+                });
             }
             //Check password(hashed)
             const validPassword = await bcrypt.compare(req.body.password, user.password);
             if (!validPassword) {
-                return res.status(404).json("Wrong password");
+                return res.status(401).json({
+                    errCode: 1,
+                    message: "Wrong password",
+                    user: {}
+                });
             }
             //Valid username & password
             if (user && validPassword) {
@@ -62,10 +79,15 @@ class AuthController {
                         secure: false,//when deploy change to true
                         path: "/",
                         sameSite: "strict",
+                        maxAge: 900000000,
                     }
                 )
                 const { password, ...others } = user._doc;//liên quan đến mongoose
-                return res.status(200).json({ ...others, accessToken });
+                return res.status(200).json({
+                    errCode: 0,
+                    message: "Login successfully",
+                    user: { ...others, accessToken }
+                });
             }
         } catch {
             res.status(500).json("error");
@@ -95,7 +117,21 @@ class AuthController {
     async logout(req, res) {
         res.clearCookie("refreshToken");
         await Token.deleteOne({ token: req.cookies.refreshToken });
-        res.status(200).json("Logged out successfully");
+        res.status(200).json({
+            errCode: 0,
+            message: "Logged out successfully",
+            user: {}
+        });
+    }
+
+    getToken(req, res) {
+        res.cookie("refreshToken", "fsdfsdfdsfs", {
+            httpOnly: true,
+            secure: true,//when deploy change to true
+            path: "/",
+            sameSite: "strict"
+        });
+        // res.send("done");
     }
 }
 

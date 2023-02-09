@@ -5,8 +5,12 @@ class UserController {
 
     getAllUsers = async (req, res) => {
         try {
-            const listUsers = await User.find();
-            res.status(200).json(listUsers);
+            const listUsers = await User.find().select('username email admin');
+            res.status(200).json({
+                errCode: 0,
+                message: "Get list users successfully",
+                listUsers
+            });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -14,8 +18,11 @@ class UserController {
 
     deleteUser = async (req, res) => {
         try {
-            const user = await User.findById(req.params.id);
-            res.status(200).json('Delete succcessfully')
+            const user = await User.findOne({ _id: req.params.id });
+            res.status(200).json({
+                errCode: 0,
+                message: 'Delete succcessfully',
+            })
         }
         catch (err) {
             res.status(500).json(err);
